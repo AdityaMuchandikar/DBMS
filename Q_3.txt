@@ -1,0 +1,45 @@
+3]
+
+Query 1: Find the publisher id who have not published any books.
+
+SELECT publisher_id
+FROM PUBLISHER
+WHERE publisher_id NOT IN (
+    SELECT DISTINCT publisher_id
+    FROM CATALOG
+);
+
+Query 2: Find the author of the book which has maximum sales.
+SELECT name
+FROM AUTHOR
+WHERE author_id = (
+    SELECT author_id
+    FROM CATALOG
+    WHERE book_id = (
+        SELECT book_id
+        FROM ORDER_DETAILS
+        GROUP BY book_id
+        ORDER BY SUM(quantity) DESC
+        LIMIT 1
+    )
+);
+
+Query 3: Demonstrate how you increase the price of books published by a specific publisher by 10%.
+UPDATE CATALOG
+SET price = price * 1.10
+WHERE publisher_id = (SELECT publisher_id FROM PUBLISHER WHERE name = 'PublisherName');
+
+Query 4: Find the author name and publisher name who live in the same city.
+SELECT a.name AS author_name, p.name AS publisher_name
+FROM AUTHOR a, PUBLISHER p
+WHERE a.city = p.city AND a.country = p.country;
+
+Query 5: Find the publisher name who have published at least 4 books.
+SELECT name
+FROM PUBLISHER
+WHERE publisher_id IN (
+    SELECT publisher_id
+    FROM CATALOG
+    GROUP BY publisher_id
+    HAVING COUNT(book_id) >= 4
+);

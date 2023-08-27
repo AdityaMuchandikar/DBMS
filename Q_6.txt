@@ -1,0 +1,44 @@
+6]
+
+Query 1: Count the customers with grades above Bangalore’s average.
+
+sql
+
+SELECT COUNT(*)
+FROM CUSTOMER
+WHERE Grade > (SELECT AVG(Grade) FROM CUSTOMER WHERE City = 'Bangalore');
+
+Query 2: Find the name and numbers of all salesmen who had more than one customer.
+
+sql
+
+SELECT S.Name, S.Salesman_id, (
+    SELECT COUNT(*)
+    FROM CUSTOMER C
+    WHERE C.Salesman_id = S.Salesman_id
+) AS customer_count
+FROM SALESMAN S
+HAVING customer_count > 1;
+
+Query 3: List all salesmen names and customer names for whom order amount is more than 4000.
+
+sql
+
+SELECT S.Name AS salesman_name, C.Cust_Name AS customer_name
+FROM SALESMAN S, CUSTOMER C, ORDERS O
+WHERE S.Salesman_id = C.Salesman_id AND C.Customer_id = O.Customer_id
+  AND S.Salesman_id = O.Salesman_id
+  AND O.Purchase_Amt > 4000;
+
+Query 4: Demonstrate the DELETE operation by removing salesman with id 1000. All his orders must also be deleted.
+
+sql
+
+DELETE FROM ORDERS
+WHERE Salesman_id = 1000;
+
+DELETE FROM CUSTOMER
+WHERE Salesman_id = 1000;
+
+DELETE FROM SALESMAN
+WHERE Salesman_id = 1000;

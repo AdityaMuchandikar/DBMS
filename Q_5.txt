@@ -1,0 +1,45 @@
+5]
+
+Query 1: Find the driver name and the model of the car which is owned by them.
+
+sql
+
+SELECT p.name, c.model
+FROM PERSON p, CAR c, OWNS o
+WHERE p.driver_id = o.driver_id
+  AND c.regno = o.regno;
+
+Query 2: Update the damage amount for the car with specific regno in the accident with report number 4 to 25000.
+
+sql
+
+UPDATE PARTICIPATED
+SET damage_amount = 25000
+WHERE regno = 'SpecificRegNo'
+  AND report_number = 4;
+
+Query 3: Find the total number of people who owned cars that were involved in accidents in the year 2020.
+
+sql
+
+SELECT COUNT(DISTINCT p.driver_id)
+FROM PERSON p, CAR c, OWNS o, PARTICIPATED pd, ACCIDENT a
+WHERE p.driver_id = o.driver_id
+  AND c.regno = o.regno
+  AND o.regno = pd.regno
+  AND pd.report_number = a.report_number
+  AND YEAR(a.accd_date) = 2020;
+
+
+Query 4:
+
+SELECT COUNT(*) AS num_accidents
+FROM PARTICIPATED pa
+JOIN CAR c ON pa.regno = c.regno
+WHERE c.model = 'specific_model';
+
+Query 5:
+
+SELECT p.driver_id, p.name
+FROM PERSON p
+WHERE p.address IN ('Belgaum', 'Gokak');

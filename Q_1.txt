@@ -1,0 +1,57 @@
+1]
+
+Query 1: Find the names of all Juniors (level = JR) who are enrolled in a class taught by Prof. Harshith
+
+SELECT s.sname
+FROM STUDENT s, CLASS c, ENROLLED e, FACULTY f
+WHERE s.snum = e.snum
+  AND c.cname = e.cname
+  AND c.fid = f.fid
+  AND s.levels = 'JR'
+  AND f.fname = 'Harshith';
+
+
+Query 2: Find the names of all classes that either meet in room R128 or have five or more Students enrolled
+
+SELECT DISTINCT c.cname
+FROM CLASS c, ENROLLED e
+WHERE c.room = 'R128'
+   OR (c.cname = e.cname
+      AND (SELECT COUNT(*) FROM ENROLLED e2 WHERE e.cname = e2.cname) >= 5);
+
+
+Query 3: Find the names of all students who are enrolled in two classes that meet at the same time.
+
+SELECT DISTINCT s.sname
+FROM STUDENT s, ENROLLED e1, ENROLLED e2, CLASS c1, CLASS c2
+WHERE s.snum = e1.snum
+  AND e1.snum = e2.snum
+  AND e1.cname <> e2.cname
+  AND e1.cname = c1.cname
+  AND e2.cname = c2.cname
+  AND c1.meetsat = c2.meetsat;
+
+Query 4: Find the names of faculty members who teach in every room in which some class is taught.**
+
+SELECT DISTINCT f.fname
+FROM FACULTY f
+WHERE NOT EXISTS (
+    SELECT DISTINCT c.room
+    FROM CLASS c
+    WHERE NOT EXISTS (
+        SELECT *
+        FROM CLASS c2
+        WHERE c2.fid = f.fid AND c2.room = c.room
+    )
+);
+
+
+Query 5: Find the names of faculty members for whom the combined enrollment of the courses that they teach is less than five.**
+
+SELECT DISTINCT f.fname
+FROM FACULTY f
+WHERE (SELECT SUM(enrollment_count)
+       FROM (SELECT COUNT(*) as enrollment_count
+             FROM CLASS c, ENROLLED e
+             WHERE c.cname = e.cname AND c.fid = f.fid
+             GROUP BY c.cname) as enrollments) < 5;

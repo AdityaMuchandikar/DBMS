@@ -1,0 +1,42 @@
+7]
+
+Query 1: List the titles of all movies directed by 'Sanjay Leela Bhansali'.
+
+sql
+
+SELECT Mov_Title
+FROM MOVIES
+WHERE Dir_id = (SELECT Dir_id FROM DIRECTOR WHERE Dir_Name = 'Sanjay Leela Bhansali');
+
+Query 2: Find the movie names where one or more actors acted in two or more movies.
+
+sql
+
+SELECT M.Mov_Title
+FROM MOVIES M
+JOIN MOVIE_CAST MC ON M.Mov_id = MC.Mov_id
+GROUP BY M.Mov_id, M.Mov_Title
+HAVING COUNT(DISTINCT MC.Act_id) >= 2;
+
+Query 3: Find the title of movies and number of stars for each movie that has at least one rating and find the highest number of stars that movie received. Sort the result by movie title.
+
+sql
+
+SELECT M.Mov_Title, MAX(R.Rev_Stars) AS Max_Stars
+FROM MOVIES M
+LEFT JOIN RATING R ON M.Mov_id = R.Mov_id
+GROUP BY M.Mov_Title
+HAVING MAX(R.Rev_Stars) IS NOT NULL
+ORDER BY M.Mov_Title;
+
+Query 4: Update rating of all movies directed by 'Ram Gopal Verma' to 5.
+
+sql
+
+UPDATE RATING
+SET Rev_Stars = 5
+WHERE Mov_id IN (
+    SELECT Mov_id
+    FROM MOVIES
+    WHERE Dir_id = (SELECT Dir_id FROM DIRECTOR WHERE Dir_Name = 'Ram Gopal Verma')
+);

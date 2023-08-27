@@ -1,0 +1,52 @@
+2]
+
+Query 1: Find the names of aircraft such that all pilots certified to operate them have salaries more than Rs. 80,000.
+
+SELECT DISTINCT a.aname
+FROM AIRCRAFT a
+WHERE NOT EXISTS (
+    SELECT e.eid
+    FROM EMPLOYEES e, CERTIFIED c
+    WHERE e.eid = c.eid AND c.aid = a.aid AND e.salary <= 80000
+);
+
+Query 2: For each pilot who is certified for more than three aircraft, find the eid and the maximum cruising range of the aircraft for which she or he is certified.
+
+
+SELECT e.eid, MAX(a.cruisingrange)
+FROM EMPLOYEES e, CERTIFIED c, AIRCRAFT a
+WHERE e.eid = c.eid AND c.aid = a.aid
+GROUP BY e.eid
+HAVING COUNT(*) > 3;
+
+Query 3: Find the names of pilots whose salary is less than the price of the cheapest route from Bengaluru to Frankfurt.
+
+
+SELECT e.ename
+FROM EMPLOYEES e
+WHERE e.salary < (
+    SELECT MIN(f.price)
+    FROM FLIGHTS f
+    WHERE f.fromPlace = 'Bengaluru' AND f.toPlace = 'Frankfurt'
+);
+
+Query 4: Find the names of pilots certified for some Boeing aircraft.
+
+
+SELECT e.ename
+FROM EMPLOYEES e
+WHERE EXISTS (
+    SELECT c.eid
+    FROM CERTIFIED c, AIRCRAFT a
+    WHERE c.eid = e.eid AND c.aid = a.aid AND a.aname LIKE 'Boeing%'
+);
+
+Query 5: Find the aids of all aircraft that can be used on routes from Bengaluru to New Delhi.
+
+SELECT a.aid
+FROM AIRCRAFT a
+WHERE NOT EXISTS (
+    SELECT f.no
+    FROM FLIGHTS f
+    WHERE f.fromPlace = 'Bengaluru' AND f.toPlace = 'New Delhi' AND f.no = a.aid
+);

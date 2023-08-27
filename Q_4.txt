@@ -1,0 +1,53 @@
+4]
+
+Query 1: Find all the customers who have at least two accounts at the main branch.
+
+sql
+
+SELECT DISTINCT d.customer_name
+FROM DEPOSITOR d, ACCOUNT a
+WHERE d.accno = a.accno
+  AND a.branch_name = 'main'
+GROUP BY d.customer_name
+HAVING COUNT(d.accno) >= 2;
+
+Query 2: Demonstrate how you delete all account tuples at every branch located in a specific city.
+
+sql
+
+DELETE FROM ACCOUNT
+WHERE branch_name IN (
+    SELECT branch_name
+    FROM BRANCH
+    WHERE branch_city = 'SpecificCity'
+);
+
+Query 3: Find the bank that has the highest average balance.
+
+sql
+
+SELECT b.branch_name
+FROM BRANCH b
+WHERE b.assets = (
+    SELECT MAX(assets)
+    FROM BRANCH
+);
+
+Query 4: Find all the customers who have both account and loan at a specific branch.
+
+sql
+
+SELECT DISTINCT c.customer_name
+FROM CUSTOMER c, ACCOUNT a, LOAN l
+WHERE c.customer_name IN (
+    SELECT d.customer_name
+    FROM DEPOSITOR d, ACCOUNT a
+    WHERE d.accno = a.accno
+      AND a.branch_name = 'SpecificBranch'
+)
+AND c.customer_name IN (
+    SELECT b.customer_name
+    FROM BORROWER b, LOAN l
+    WHERE b.Loan_number = l.Loan_number
+      AND l.branch_name = 'SpecificBranch'
+);
