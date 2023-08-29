@@ -1,0 +1,115 @@
+<--------------------------------------------------------------7 Movie------------------------------------------------>
+create table Actor(
+Act_id int primary key,
+Act_Name varchar(50),
+Act_Gender char(1));
+
+create table Director(
+Dir_id int primary key,
+Dir_Name varchar(50),
+Dir_Phone int(10)
+);
+
+create table Movies(
+Mov_id int,
+Mov_Title varchar(50),
+Mov_Year int(4),
+Mov_Lang varchar(50),
+Dir_id int,
+primary key(Mov_id,Dir_id)
+Foreign key (Dir_id) references Director(Dir_id)
+);
+
+create table Movie_Cast(
+Act_id int,
+Mov_id int,
+Role varchar(50),
+primary key(Act_id,Mov_id),
+foreign key(Mov_id) references Movies(Mov_id),
+foreign key(Act_id) references Actor(Act_id)
+);
+
+create table Rating(
+Mov_id int primary key,
+Rev_Stars varchar(50),
+foreign key (Mov_id) references Movies(Mov_id)
+);
+
+insert into Actor(Act_id,Act_Name,Act_Gender) 
+values
+(1,"Akshay Kumar",'M'),
+(2,"Salman Khan","M"),
+(3,"Alia Bhat","F"),
+(4,"Katrina Kaif","F"),
+(5,"SRK","M");
+
+insert into Director(Dir_id,Dir_Name,Dir_Phone)
+values
+(1,"SLB",Null),
+(2,"RGV",Null),
+(3,"KJO",Null),
+(4,"Aditya Chavan",Null),
+(5,"Prabhu Deva",Null),
+(6,"Raghava L",Null),
+(7,"Jagan Shakti",Null),
+(8,"Tinu Desai",Null);
+
+insert into Movies(Mov_id,Mov_Title,Mov_Year,Mov_Lang,Dir_id)
+values
+(1,"Devdas",NULL,"Hindi",1),
+(2,"Radhe",NULL,"Hindi",5),
+(3,"DDLJ",NULL,NULL,4),
+(4,"Laxmi Bomb",NULL,NULL,6),
+(5,"Mission Mangal",NULL,NULL,7),
+(6,"Rustom",NULL,NULL,8);
+
+insert into Movie_Cast(Act_id,Mov_id,Role)
+values
+(1,4,"Lead"),
+(1,5,NULL),
+(1,6,NULL),
+(2,2,NULL),
+(3,1,NULL),
+(3,3,NULL);
+
+insert into Rating values(1,4);
+insert into Rating values(2,3);
+insert into Rating values(3,5);
+insert into Rating values(4,4);
+insert into Rating values(5,3);
+insert into Rating values(6,3);
+
+
+Queries:
+1) List the titles of all movies directed by ‘Sanjay Leela Bansali’
+select Mov_Title 
+from Movies
+where Dir_id IN (select Dir_id
+from Director
+where Dir_Name="SLB");
+
+2) Find the movie names where one or more actors acted in one or two movies.
+select Mov_Title 
+from Movies M,Movie_Cast MV
+where M.Mov_id=MV.Mov_id AND Act_id IN 
+(select Act_id from Movie_Cast
+Group By Act_id having count(Act_id) >1)
+Group By Mov_Title
+Having Count(*)>1;
+
+3)Find the title of movies and number of stars for each movie that has at least one rating and find the highest number of stars that movie received. Sort the result by movie title.select Mov_Title,MAX(Rev_Stars)
+from Movies
+Inner Join Rating using (Mov_id)
+group by Mov_Title
+having MAX(Rev_Stars)>1
+ORDER BY Mov_Title;
+
+4) Update rating of all movies directed by ‘Ram GopalVerma’ to 5.
+Update Rating
+set Rev_Stars=5
+where Mov_id in
+(select Mov_id from Movies
+where Dir_id in
+(select Dir_id 
+from Director 
+where Dir_Name='RGV')); 

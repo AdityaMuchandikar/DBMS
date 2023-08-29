@@ -1,0 +1,69 @@
+<--------------------------------------------------------------3 Book----------------------------------------------->
+create table Author(author_id int primary key,
+     name varchar(50),
+     city varchar(50),
+     country varchar(50));
+
+    create table Publisher(publisher_id int primary key,
+     name varchar(50),
+    city varchar(50),
+     country varchar(50));
+
+create table Category(category_id int primary key,
+description varchar(100));
+
+create table Catalog(book_id int primary key,
+      title varchar(50),
+     author_id int,
+     publisher_id int,
+    category_id int,
+     year int,
+      price int,
+     foreign key(author_id)references Author(author_id),
+    foreign key(publisher_id)references Publisher(publisher_id),
+ foreign key(category_id)references Category(category_id));
+
+ create table order_detail(order_no int primary key,book_id int, quantity int, foreign key(book_id)references catalog(book_id));
+
+
+
+Insert into Author(author_id,name,city,country)values(101,'XXX','Banglore','Ind'),(102,'YYY','washington','USA'),(103,'ABC','Colombo','Srilanka'), (104,'XYZ','Delhi','Ind'),(105,'AAA','Kanpur','Ind');
+
+ insert into Publisher(publisher_id,name,city,country)values(201,'Smith','Banglore','Ind'),(202,'Raj','Kanpur','Ind'),(203,'Will','paris','France'),(204,'Venky','Nagpur','Ind'),(205,'Dany','Patna','Bihar');
+
+insert into category(category_id,description)values(111,'COMIC'),(112 ,'SCIFI'),(113,'Action'),(114,'COMIC'),(115,'FIGHT');
+
+insert into catalog(book_id,title,author_id,publisher_id,category_id,year,price)values(51,'Harry Potter',101,201,112,1998,10000),(52,'abc1',101,202,111,2020,500),(53,'abc2',103,204,114,2015,1200),(54,'abc3',101,201,111,2019,1000),(56,'abc5',101,201,113,2018,1400),(55,'abc6',102,201,114,2023, 1000),(57,'ab',103,201,113,2021,12000);
+
+ insert into order_detail(order_no,book_id,quantity)values(501,51,2),( 502,52,1),(503,53,3),(504,51,10),(505,52,5);
+Q1.1. Find the publisher id who have not published any books.
+select publisher_id
+     from publisher
+     where publisher_id Not In(select publisher_id
+     from catalog );
+
+Q2.2. Find the author of the book which has maximum sales.
+select A.author_id ,A.name from author A join catalog C on C.author_id=A.author_id
+    join Order_detail O on O.book_id=C.book_id
+     Group by A.author_id ,A.name
+      Order by sum(O.quantity) DESC LIMIT 1;
+
+Q3.3. Demonstrate how you increase the price of books published by a specific publisher by 10%. 
+
+UPDATE CATALOG
+SET price = price * 1.10
+WHERE publisher_id = <specific_publisher_id>;
+
+
+
+Q4.4. Find the author name and publisher name who live in the same city.
+select A.name as Author_name,p.name as Publisher_name
+    from author A
+     join publisher p on p.city=A.city;
+
+Q5.5. Find the publisher name who have published at least 4 books.
+
+select p.name
+    from Publisher p
+     join catalog c on p.publisher_id=c.publisher_id
+     group by p.name having count(book_id)>4;

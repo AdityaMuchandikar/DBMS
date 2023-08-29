@@ -1,0 +1,129 @@
+<--------------------------------------------------------------4 Bank----------------------------------------------->  
+create table Branch(branch_name varchar(50) primary key,
+    branch_city varchar(50),
+assets real);
+
+
+ create table Account(accno int primary key,
+     branch_name varchar(50),
+     balance real,
+     foreign key(branch_name)references Branch(branch_name) on delete set Null);
+
+
+CREATE TABLE customer (
+    cust_name VARCHAR(50) PRIMARY KEY,
+    cust_street VARCHAR(100),
+    cust_city VARCHAR(50)
+);
+
+
+create table depositor(cust_name varchar(50),
+     accno int,
+     foreign key(cust_name)references Customer(cust_name) on delete cascade,
+     foreign key(accno)references Account(accno)on delete cascade,
+     primary key(cust_name,accno));
+
+create table Loan(Loan_no int primary key,
+     branch_name varchar(50),
+    amount real,
+     foreign key(branch_name)references branch(branch_name)on delete cascade);
+
+create table Borrower(cust_name varchar(50),
+    Loan_no int primary key,
+    foreign key(Cust_name)references Customer(cust_name)on delete cascade,
+     foreign key(Loan_no)references Loan(Loan_no) on delete cascade);
+
+
+
+
+
+
+INSERT INTO branch (branch_name, branch_city, assets)
+VALUES
+    ('b1', 'c1', 1000),
+    ('b2', 'c2', 2000),
+('Main', 'c5', 250000),
+('s','c4',5000);
+
+
+
+INSERT INTO account (accno, branch_name, balance)
+VALUES
+    (12, 'b1', 3000),
+    (13, 'b2', 4000),
+    (15, 'b1', 10000),
+    (16, 'b1', 2000),
+    (17, 'b2', 9000),
+    (18, 'Main', 250000),
+    (19, 'Main', 54000),
+(20, 'Main', 20000),
+(100,'s',7000);
+
+
+
+
+INSERT INTO customer (cust_name, cust_street, cust_city)
+VALUES
+    ('A', 's4', 'v'),
+    ('B', 's3', 'a'),
+    ('D', 's2', 'c'),
+    ('G', 's1', 'b'),
+('xyz', 'abc', 'aaa'),
+('Z','git','bgm');
+
+INSERT INTO depositor (cust_name, accno)
+VALUES
+    ('G', 12),
+    ('D', 13),
+('xyz', 19),
+('Z',100);
+
+
+INSERT INTO loan (Loan_no, branch_name, amount)
+VALUES
+    (1, 'b1', 10000),
+(2, 'b2', 5000),
+ (16,'s',30000);
+
+
+INSERT INTO borrower (cust_name, Loan_no)
+VALUES
+    ('B', 1),
+    ('D', 2),
+ ('Z',16);
+
+Queries:
+1. Find all the customers who have at least two accounts at the main branch.
+
+select d.cust_name
+     from depositor d ,account a
+     where d.accno=a.accno
+    and a.branch_name='Main'
+ group by d.cust_name having count(cust_name)>=2;
+
+2. Demonstrate how you delete all account tuples at every branch located in a specific city.
+
+delete from account
+     where branch_name In(select branch_name
+     from branch
+     where branch_city='c2');
+
+
+3. Find the bank that has having highest average balance.
+
+ select branch_name
+    from account
+     group by branch_name
+     order by avg(balance) Desc
+     limit 1;
+
+4. Find all the customers who have both account and loan at specific branch
+ SELECT C.cust_name
+     FROM customer C
+     JOIN depositor D ON C.cust_name = D.cust_name
+     JOIN account A ON D.accno = A.accno AND A.branch_name = 's'
+    INTERSECT
+     SELECT C.cust_name
+     FROM customer C
+     JOIN borrower B ON C.cust_name = B.cust_name
+     JOIN loan L ON B.Loan_no = L.Loan_no AND L.branch_name = 's';

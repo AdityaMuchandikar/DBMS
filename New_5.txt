@@ -1,0 +1,86 @@
+<--------------------------------------------------------------5 Insurance----------------------------------------------->  
+create table Person(driver_id int primary key,
+     name varchar(50),
+     address varchar(50));
+
+
+
+ create table Car(regno int primary key,
+    model varchar(50),
+     year int);
+
+create table  Accident(report_no int primary key,
+     accd_date date,
+     location varchar(50));
+
+create table Owns(driver_id int primary key,
+    regno int ,
+    foreign key(regno)references Car(regno)on delete cascade,
+     foreign key(driver_id)references person(driver_id));
+
+ create table participated(driver_id int primary key,
+     regno int,
+    report_no int,
+    damage_amount int,
+     foreign key(regno)references car(regno)on delete cascade,
+     foreign key(driver_id)references person(driver_id)on delete cascade,
+     foreign key(report_no)references Accident(report_no)on delete cascade);
+
+ insert into person(driver_id,name,address)values(1,'xyz','bgm'),(2,'abx','gokak'),(3,'sss','bid'),(4,'abc1','pune'),(5,'vish','bgm ');
+
+ insert into car(regno,model,year)
+values
+(11,'nexon',2020),(22,'swift',2022),(33,'bmw',2019),(44,'alto',2021),(55,'maruti',2016);
+
+
+ INSERT INTO Accident(report_no, accd_date, location)
+    VALUES
+      (1, '2022-01-08', 'bgm'),
+       (2, '2020-10-01', 'pune'),
+        (3, '2020-10-12', 'nagpur'),
+        (4, '2019-03-01', 'delhi'),
+         (5, '2023-05-10', 'mumbai'),
+         (6, '2022-12-31', 'pune');
+
+ insert into owns(driver_id,regno)values(1,11),(2,22),(4,55),(3,11);
+
+ insert into participated(driver_id,regno,report_no,damage_amount)values(1,11,1,200),(4,33,3,500),(2,22,4,600);
+
+Queries:
+Query 1: Find the driver name and the model of the car which is owned by them.
+
+
+SELECT p.name, c.model
+FROM PERSON p, CAR c, OWNS o
+WHERE p.driver_id = o.driver_id
+  AND c.regno = o.regno;
+
+Query 2: Update the damage amount for the car with specific regno in the accident with report number 4 to 25000.
+
+
+
+UPDATE PARTICIPATED
+SET damage_amount = 25000
+WHERE regno = '11'
+  AND report_no = 4;
+
+Query 3: Find the total number of people who owned cars that were involved in accidents in the year 2020.
+
+
+
+SELECT COUNT(DISTINCT p.driver_id)
+FROM PERSON p, CAR c, OWNS o, PARTICIPATED pd, ACCIDENT a
+WHERE p.driver_id = o.driver_id
+  AND c.regno = o.regno
+  AND o.regno = pd.regno
+  AND pd.report_no = a.report_no
+  AND YEAR(a.accd_date) = 2020;
+
+4. Find the number of accidents in which cars belonging to a specific model were 
+involved. 
+select count(*) as Totalcars from car c,participated p where c.regno=p.regno and c.model='Alto'
+
+5. Find the driver id and names of the drivers who stays in either Belgaum or Gokak
+Select d.driver_id, d.name 
+  from person d
+  where address in("Belgaum","Gokak");

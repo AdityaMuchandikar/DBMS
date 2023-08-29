@@ -1,0 +1,90 @@
+<--------------------------------------------------------------2 Aeroplane----------------------------------------------->  
+CREATE TABLE FLIGHTS
+   (FNo integer,
+   fP varchar(20), tp varchar(20),
+   Dist integer,
+   Departs date,
+   arrives date,
+   price real,
+   PRIMARY KEY (Fno));
+
+CREATE TABLE AIRCRAFT
+   (aid integer,
+   aname varchar (15),
+   cruisingrange integer,
+   PRIMARY KEY (aid));
+	
+CREATE TABLE EMPLOYEES
+   (eid integer,
+   ename varchar (15),
+   salary integer,
+   PRIMARY KEY (eid));
+Create table certified
+( eid int,
+Aid int,
+Primary key(eid,aid),
+Foreign key(Eid) references Employees(eid),
+Foreign key(aid) references Aircraft(aid));
+
+insert into Flights(FNo,fP,tP,Dist,Departs,Arrives,Price)values(255,'Banglore','frankfurt',200,'2011-08-01','2011-08-01',5000);
+insert into FLights(FNo,fP,tP,Dist,Departs,Arrives,Price)values(256,'Banglore','frankfurt',200,'2011-08-01','2011-08-01',8000),(257,'Banglore','New Delhi',200,'2011-08-01','2011-08-01',5000),(258,'Banglore','New Delhi',200,'2011-08-01','2011-08-01',6000);
+
+insert into AIRCRAFT(aid,aname,cruisingrange)values(685,'boeing15',1000),(686,'boeing10',1200),(687,'skytrain',1000),(688,'avenger',100);
+
+
+insert into employees(eid,ename,salary)values(101,'Asha',90000),(102,'Arun',85000),(103,'Anand',3000),(104,'ramya',4000);
+
+insert into Certified(eid,aid)values(101,685),(101,686),(101,687),(101,688),(102,685),(103,685),(103,686);
+Queries:
+
+2.
+Query 1: Find the names of aircraft such that all pilots certified to operate them have salaries more than Rs. 80,000.
+
+SELECT DISTINCT a.aname
+FROM AIRCRAFT a
+WHERE NOT EXISTS (
+    SELECT e.eid
+    FROM EMPLOYEES e, CERTIFIED c
+    WHERE e.eid = c.eid AND c.aid = a.aid AND e.salary <= 80000
+);
+
+Query 2: For each pilot who is certified for more than three aircraft, find the eid and the maximum cruising range of the aircraft for which she or he is certified.
+
+
+SELECT e.eid, MAX(a.cruisingrange)
+FROM EMPLOYEES e, CERTIFIED c, AIRCRAFT a
+WHERE e.eid = c.eid AND c.aid = a.aid
+GROUP BY e.eid
+HAVING COUNT(*) > 3;
+
+Query 3: Find the names of pilots whose salary is less than the price of the cheapest route from Bengaluru to Frankfurt.
+
+
+SELECT e.ename
+FROM EMPLOYEES e
+WHERE e.salary < (
+    SELECT MIN(f.price)
+    FROM FLIGHTS f
+    WHERE f.fp = 'Bengaluru' AND f.tp = 'Frankfurt'
+);
+
+Query 4: Find the names of pilots certified for some Boeing aircraft.
+
+
+SELECT e.ename
+FROM EMPLOYEES e
+WHERE EXISTS (
+    SELECT c.eid
+    FROM CERTIFIED c, AIRCRAFT a
+    WHERE c.eid = e.eid AND c.aid = a.aid AND a.aname LIKE 'Boeing%'
+);
+
+Query 5: Find the aids of all aircraft that can be used on routes from Bengaluru to New Delhi.
+
+SELECT a.aid
+FROM AIRCRAFT a
+WHERE NOT EXISTS (
+    SELECT f.Fno
+    FROM FLIGHTS f
+    WHERE f.fp = 'Bengaluru' AND f.tp = 'New Delhi' AND f.Fno = a.aid
+);

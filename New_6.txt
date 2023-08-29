@@ -1,0 +1,107 @@
+<--------------------------------------------------------------6 Order------------------------------------------------>
+create table SALESMAN
+(
+Salesman_id int,
+Name varchar(50),
+City varchar(50),
+Commission int,
+primary key(Salesman_id)
+);
+
+create table CUSTOMER
+(
+Customer_id int,
+Cust_namevarchar(50),
+City varchar(50),
+Grade int,
+Salesman_idint,
+primary key (Customer_id),
+foreign key(Salesman_id) references SALESMAN (Salesman_id) on delete set NULL
+);
+
+create table ORDERS
+(
+Ord_noint,
+Purchase_amtint,
+Ord_date date,
+Customer_idint,
+Salesman_idint,
+primary key (Ord_no),
+foreign key (Customer_id) references CUSTOMER (customer_id) on delete cascade,
+foreign key (Salesman_id) references SALESMAN (Salesman_id) on delete cascade
+);
+
+INSERT INTO SALESMAN VALUES (1000, ’JOSEPH’,’MYSORE’,’13’); 
+INSERT INTO SALESMAN VALUES (1001, ’GIRISH’,’BANGALORE’,’22’); 
+INSERT INTO SALESMAN VALUES (1002, ’MUKUND’,’MUMBAI’,’16’);
+INSERT INTO SALESMAN VALUES (1003, ’SAURABH’,’DELHI’,’19’);
+INSERT INTO SALESMAN VALUES (1004, ’SRINIVAS’,’HYDRABAD’,’23’); 
+INSERT INTO SALESMAN VALUES (1005, ’MOHAN’,’RANCHI’,’23’);
+
+
+INSERT INTO CUSTOMER VALUES (1, ’SHARAL’,’HYDRABAD’,40,1004); 
+INSERT INTO CUSTOMER VALUES (2,’MEENAKSHI’,’MANGALORE’,40,1000); 
+INSERT INTO CUSTOMER VALUES (3,’VIKKY’,’MUMBAI’,35,1002);
+INSERT INTO CUSTOMER VALUES (4, ’JOHN’,’MUMBAI’,20,1002); 
+INSERT INTO CUSTOMER VALUES (5, ’GEORGE’,’BANGALORE’,10,1001); 
+INSERT INTO CUSTOMER VALUES (6, ’HEVIN’,’BANGALORE’,50,1001); 
+INSERT INTO CUSTOMER VALUES (7, ’ROSHAN’,’DELHI’,45,1003);
+INSERT INTO CUSTOMER VALUES (8, ’VIMALA’,’CHENNAI’,35,1001); 
+INSERT INTO CUSTOMER VALUES (9, ’NAKUL’,’AYODHYA’,15,1005);
+
+
+INSERT INTO ORDERS VALUES (111, 50000, '2017-01-04', 1, 1004);
+INSERT INTO ORDERS VALUES (222, 45000, '2017-01-04', 2, 1000);
+INSERT INTO ORDERS VALUES (333, 10000, '2017-02-05', 3, 1002);
+INSERT INTO ORDERS VALUES (444, 35000, '2017-03-13', 4, 1003);
+INSERT INTO ORDERS VALUES (555, 75000, '2017-03-14', 5, 1001);
+INSERT INTO ORDERS VALUES (666, 25000, '2017-03-14', 6, 1004);
+INSERT INTO ORDERS VALUES (777, 5000, '2017-06-27', 7, 1003);
+INSERT INTO ORDERS VALUES (888, 52000, '2017-08-25', 8, 1001);
+INSERT INTO ORDERS VALUES (991, 37000, '2017-08-25', 1, 1004);
+INSERT INTO ORDERS VALUES (992, 29000, '2017-09-09', 2, 1000);
+
+SELECT * FROM SALESMAN;
+
+SELECT * FROM CUSTOMER;
+
+select * from ORDERS;
+
+1.	Count the customers with grades above Bangalore’s average.
+
+          SELECT COUNT(Customer_id)
+     FROM Customer
+    WHERE Grade > (SELECT AVG(Grade)
+                   FROM Customer
+                   WHERE city = "Bengaluru");
+Group By Grade
+
+
+2.	Find the name and numbers of all salesmen who had more than one customer.
+
+Select S.Name,count(Customer_id)
+From Salesman S,Customer C
+Where S.Salesman_id=C.Salesman_id
+Group By S.Name
+Having count(*)>1;
+
+3.	List all salesmen names and customer names for whom order amount is more than 4000. 
+
+   Select S.Name,C.Cust_Name
+From Salesman S,Customer C,Orders O
+Where S.Salesman_id=O.Salesman_id and C.Customer_id=O.Customer_id and O.Purchase_Amt>4000;
+
+
+
+4.	Demonstrate the DELETE operation by removing salesman with id 1000. All his orders must also be deleted.
+
+
+Delete from SALESMAN Where Salesman_Id=1000;
+
+select* from salesman;
+
+
+select* from CUSTOMER;
+
+
+select* from ORDERS;
